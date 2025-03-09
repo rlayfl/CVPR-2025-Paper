@@ -50,14 +50,13 @@ First line of institution2 address\\
 
 \begin{abstract}
     The ABSTRACT is to be in fully justified italicized text, at the top of the left-hand column, below the author and affiliation information.
-    Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centered relative to the column, initially capitalized.
+    Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centred relative to the column, initially capitalized.
     The abstract is to be in 10-point, single-spaced type.
     Leave two blank lines after the Abstract, then begin the main text.
     Look at previous \confName abstracts to get a feel for style and length.
     \end{abstract}
 
 \section{Introduction}
-
 
 and discusses the method used for generating labels for the synthetic data. The paper also discusses the applications of the synthetic data, such as training object detection models. The paper concludes with a discussion of future work. 
 
@@ -73,21 +72,23 @@ However, synthetic data generation can often lead to data which is too clean loo
 
 \subsection{Efficiency}
 
-To test the efficiency of the pipeline, a total of 1000 images were generated. With an initial delay of 5 seconds to allow the simulation to properly load and with a time taken of 2 seconds per image, the total time taken to generate the images was 33 minutes and 25 seconds. This does not include the time taken to generate the environment or the buoys, which was done separately.
+To test the efficiency of the pipeline, a total of 1000 images were generated. With an initial delay of 5 seconds to allow the simulation to properly load and with a time taken of 2 seconds per image, the total time taken to generate the images was 33 minutes and 25 seconds. This does not include the time taken to generate the environment or the buoys, which was carried out separately. Furthermore, running the python script to generate the labels takes only a few seconds. This is covered in more detail in section \ref{sec:mask_coordinates}.
 
 At a resolution of 512x512, around 600MB in data was generated, consisting of images with varying backgrounds, camera positions, lighting and weather conditions. This method frees up time for researches to focus on other tasks such as building the environments and sourcing realistic 3D models and textures. 
 
 \subsection{Vast Scope of Possible Scenarios}
 
-Unreal Engine 5 allows for the creation of realistic environments in basically any setting, if one can source the correct assets. This allows for the generation of data which covers scenarios which might be difficult or impossible to capture in the real world. For example, it allows for the generation of data in dangerous conditions or in conditions which are difficult to access.
+Unreal Engine 5 allows for the creation of realistic environments in basically any setting, if one can source the correct assets. This allows for the generation of data which covers scenarios which might be difficult or impossible to capture in the real world. For example, it allows for the generation of data in dangerous conditions such as in a storm or natural disaster and inconvenient conditions such as specific times of day or year.
 
 \section{Methodology}
 
+\subsection{Introduction}
+
+The synthetic data generation system was built using Unreal Engine 5.4 and Python 3.11. The two systems do not run in unison and require running once each to generate the data, first the Unreal Engine simulation and then the Python script. The Unreal Engine simulation generates the images and the Python script generates the labels. While Unreal Engine sports a powerful blueprint system, C++ code was mainly used to develop the system such as event sequencing \ref{sec:handling_concurrent_actions}, camera positioning \ref{sec:positioning_the_camera} and screenshot capture .
+
 \subsection{Achieving High Fidelity} \label {sec:achieving_high_fidelity}
 
-
-
-Aside from being an efficient method of generating synthetic data, the contents of the data can be completely controlled. There are no hallucinations to deal with and temporal consistency is maintained throughout the data. Once high 
+Aside from being an efficient method of generating synthetic data, the contents of the data can be completely controlled. Unlike content generated with some neural networks \cite{richter2021enhancingphotorealismenhancement}, there are no hallucinations to deal with and temporal consistency is maintained throughout the data.
 
 
 \section{The Environment}
@@ -122,30 +123,40 @@ The second method was to use high dynamic range images (HDRI) to create the illu
 
 As with the terrain, two methods were experimented with for generating a realistic sky. The first was to use a plugin called Ultra Dynamic Sky \cite{UltraDynamicSky} which provided scene-wide realistic sky scapes and weather conditions. The second was to use a high dynamic range image (HDRI) to create the illusion of a sky. This method works well for static scenes in which minimal movement is required.
 
-
 \subsection{The Weather}
 
-Ultra dynamic weather
+Weather conditions, such as rain, snow and fog were also generated with the Ultra Dynamic Sky plugin, which includes a package called Ultra Dynamic Weather. As with the sky, this plugin allows for the generation of a range of weather scenarios which can be controlled. This was the only method used for generating weather conditions as it was the most efficient and realistic method found. Unlike with a HDRI, this method is not location specific and allows for weather simulation at any position within the scene.
 
 \section{The Buoys}
 
-\subsection{Introduction}
-
 \subsection{The Buoys} \label{sec:the_buoys}
 
-The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The buoys 
+The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The 3d models were purchased and imported into the scene. A class of MarkerBuoyBase was created which was inherited by all buoys in the scene. This class contained the logic for the buoys' behaviour.
+
+Each buoy was placed in the scene at the same location to allow for the HDRI background to be effective, with all buoys apart from the subject of the current visit being set to invisible.
 
 \subsection{Buoyancy}
 
-Pontoons
+Unreal Engine 5's water plugin allows for buoyancy simulation through the use of virtual pontoons. They act in the scene like invisible floatation aides and can be attached to objects allowing for fine tuning of the buoyancy of an object. The pontoons can be given X, Y and Z coordinates, relative to the object they are attached to, along with a buoyancy force.
+
+For each buoy, 4 pontoons were placed at relative co-ordinates of:
+
+\begin{itemize}
+
+    \item X: 300, Y: 300, Z: 150
+    \item X: 300, Y: -300, Z: 150
+    \item X: -300, Y: -300, Z: 150
+    \item X: -300, Y: 300, Z: 150 
+
+\end{itemize}
 
 \section{The Data Generation Pipeline}
 
 \subsection{Introduction}
 
-Having a realistic environment is great and can be a lot of fun to make. However, it does not achieve the end goal of this project. Actually having data which can be used to train models, with minimal input from users is the goal. This section discusses the pipeline, alias SyntheticDataGenerationSystem used to generate the data.
+Having a realistic environment is great and can be a lot of fun to make. However, it does not achieve the end goal of this project. Actually having data which can be used to train models, with minimal input from users is the goal. This section discusses the pipeline, dubbed SyntheticDataGenerationSystem, which was a C++ class included as an actor in the scene and used to generate the data.
 
-Included as an actor in the world. 
+SyntheticDataGenerationSystem worked by looping through all of the actors in the scene which share the parent class of MarkerBuoyBase. The system effectively works by setting all buoys to the colour red \ref{sec:semantic_segmentation_masks}, hiding all of the buoys, positioning the camera randomly near the buoy and facing it, showing the buoy, taking a screenshot, changing its colour from red to its normal texture by changing its render pass in real time, taking a second screenshot and then hiding the buoy again. This process is repeated for each buoy in the scene. Once all of the images have been created, a Python script \ref{sec:mask_coordinates} is run which gets the coordinates of the outline of the buoy in the image and stores them in a .txt file.
 
 \subsection{Handling Concurrent Actions} \label {sec:handling_concurrent_actions}
 
@@ -154,26 +165,15 @@ With the simulation being run in a video game engine, everything happens at inte
 To schedule the events, a cumulative delay was added to the timer handle in the form of:
 
 cumulativeDelay = initialDelay + (markerBuoyNumber * numberOfVisits + visitNumber) * visitInterval;
+ 
 
-Wait 5 seconds 
-
-Position the camera
-
-Take a screenshot
-
-
-
-\subsection{Positioning the Camera}
+\subsection{Positioning the Camera} \label {sec:positioning_the_camera}
 
 To replicate the position of a camera as if it were on some sort of vessel, randomisation of the camera's position was included.
 
-\subsection{Automating Screenshot Capture}
+\subsection{Determining the Position of the Buoy}
 
-By making use of FTimerHandle, as mentioned in \ref{sec:handling_concurrent_actions}, screenshots could be taken at set intervals. 
-
-\subsection{Generating Labels}
-
-Two methods for generating labels were used. The first was to generate bounding boxes around the buoys in the scene using the inbuilt head's up display (HUD) feature. The second was to generate masks of the buoys in the scene. 
+Two methods for generating labels were tested. The first was to generate bounding boxes around the buoys in the scene using the inbuilt head's up display (HUD) feature. The second was to generate masks of the buoys in the scene. 
 
 \subsection{Bounding Boxes}
 
@@ -186,15 +186,30 @@ Bounding boxes were generated by detecting points on the screen, per frame, whic
     \label{fig:buoy_with_bounding_box}
 \end{figure}
 
-\subsection{Masks}
+\subsection{Semantic Segmentation Masks} \label {sec:semantic_segmentation_masks}
 
-To generate masks of the buoys in the scene, the following steps were taken:
+To set the buoys as a uniform and unique colour, Unreal Engine 5's Custom Depth feature was used. One can liken this to the layer feature in software such as Adobe Photoshop. This feature allows a static mesh to be rendered in a separate render pass, with this render pass (or "layer") having a separate material applied to it.  This feature was used to render the chosen buoy in just the colour red (RGB: 255, 0, 0).
 
-\begin{enumerate}
-    \item Set buoy to be displayed as a uniform and unique colour
-    \item Take a screenshot of the scene
-    \item Use custom python script to get the coordinates of the mask
-\end{enumerate}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{images/ppm_mask.png}
+    \caption{An image of the blueprint used to generate the material for all objects in the chosen render pass.}
+    \label{fig:ppm_mask}
+\end{figure}
+
+Inside the material, a Scene Texture node was added with a Scene Texture ID of PostProcessInput0, followed by the creation of a second Scene Texture node with a Scene Texture ID of CustomStencil.
+
+The RGB values of the colour (color) output of PostProcessInput0 were connected to a Linear Interpolation node's A and B input values, with the R value (just red) of CustomStencil's colour output connected to the Alpha input of the Linear Interpolation node.
+
+The R value of CustomStencil was also connected to a Subtract node's A input, with the B input set to 1.0. The output of the Subtract node was connected to a Clamp node with the Min set to 0.0 and the Max set to 1.0. The output of the Clamp node was then connected to the Alpha input of a second Linear Interpolation node.
+
+A 3 Vector Constant node with its RGB values set to 1.0, 0.0, 0.0 was connected to the B input of the second Linear Interpolation node. The output of the first Linear Interpolation node was connected to the Alpha input of the second Linear Interpolation node. Finally, the output of the second Linear Interpolation node was connected to the Emissive Colour input of the material. This material should then be applied to every static mesh with a CustomDepth Stencil Value of 2.
+
+\subsection{Automating Screenshot Capture}
+
+By making use of FTimerHandle, as mentioned in \ref{sec:handling_concurrent_actions}, screenshots could be taken at set intervals. For each visit, two screenshots per buoy were taken, the first with the red semantic segmentation mask applied and the second without, with each being stored in separate directories. The position of the buoy was frozen for this so that the mask's coordinates perfectly matched that of the buoy in the unmasked image.
+
+\subsection{Storing Mask Coordinates with a Python Script} \label {sec:mask_coordinates}
 
 \begin{figure}[t]
     \centering
@@ -203,9 +218,7 @@ To generate masks of the buoys in the scene, the following steps were taken:
     \label{fig:buoy_without_mask}
 \end{figure}
 
-\section{Results}
-
-
+A Python script, dubbed Mask Pixel Joiner, was created. For each image inside the masked screenshot directory, the script would open the image and scan each row from left to right, until a red pixel was found. The script would then store the x and y coordinates of the red pixel. This would continue for every row of pixels. Once this was completed, the same process would be carried out but from bottom to top and right to left, determining the pixels which made up the edge of the buoy in an anti-clockwise direction. The coordinates were then stored in a .txt file.
 
 
 \section{Applications}
@@ -213,6 +226,8 @@ To generate masks of the buoys in the scene, the following steps were taken:
 The main application of this work is for generating data to train object detection models. 
 
 \section{Conclusion}
+
+In conclusion, this method for generating data is efficient and allows for scenarios to be catered for which might be difficult or impossible to capture in the real world. The data generated is of high fidelity and has high potential for use in training object detection models.
 
 \section{Future Work}
 
