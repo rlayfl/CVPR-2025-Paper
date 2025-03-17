@@ -49,18 +49,12 @@ First line of institution2 address\\
 \maketitle
 
 \begin{abstract}
-    The ABSTRACT is to be in fully justified italicized text, at the top of the left-hand column, below the author and affiliation information.
-    Use the word ``Abstract'' as the title, in 12-point Times, boldface type, centred relative to the column, initially capitalized.
-    The abstract is to be in 10-point, single-spaced type.
-    Leave two blank lines after the Abstract, then begin the main text.
-    Look at previous \confName abstracts to get a feel for style and length.
+    This paper presents a method for generating large-scale sets of synthetic data of ocean marker buoys using Unreal Engine 5. The method is discussed in detail, including development of the environment, buoys and data generation pipeline. The paper also discusses the benefits of synthetic data generation, particularly in the context of maritime navigation as this can often take place in inconvenient or dangerous conditions. This paper covers a two-stage pipeline using Unreal Engine 5.4's C++ classes for image generation and Python for labelling, capable of generating around 2000 pieces of labelled data (images and labels) per hour.
     \end{abstract}
 
 \section{Introduction}
 
-and discusses the method used for generating labels for the synthetic data. The paper also discusses the applications of the synthetic data, such as training object detection models. The paper concludes with a discussion of future work. 
-
-The data produced should be as realistic as possible to ensure that the models trained on it are able to be applied to real world data. The method for achieving high fidelity data is discussed in \ref{sec:achieving_high_fidelity}.
+Collecting real-world data for training object detection models, especially in the context of maritime navigation, can be a lengthy process and inconvenient process, potentially incurring risk to researchers in some settings, such as extreme weather. Synthetic data can supplement real-world datasets or, in some cases, entirely replace them in model training.
 
 \section{Literature Review}
 
@@ -72,9 +66,9 @@ However, synthetic data generation can often lead to data which is too clean loo
 
 \subsection{Efficiency}
 
-To test the efficiency of the pipeline, a total of 1000 images were generated. With an initial delay of 5 seconds to allow the simulation to properly load and with a time taken of 2 seconds per image, the total time taken to generate the images was 33 minutes and 25 seconds. This does not include the time taken to generate the environment or the buoys, which was carried out separately. Furthermore, running the python script to generate the labels takes only a few seconds. This is covered in more detail in section \ref{sec:mask_coordinates}.
+To test the efficiency of this data generation method, a total of 1000 images were generated. With an initial delay of 5 seconds to allow the simulation to properly load and with a time taken of 2 seconds per image, the total time taken to generate the images was 33 minutes and 25 seconds. This does not include the time taken to generate the environment or the buoys, which was carried out separately. Furthermore, running the python script to generate the labels takes only a few seconds. This is covered in more detail in section \ref{sec:mask_coordinates}.
 
-At a resolution of 512x512, around 600MB in data was generated, consisting of images with varying backgrounds, camera positions, lighting and weather conditions. This method frees up time for researches to focus on other tasks such as building the environments and sourcing realistic 3D models and textures. 
+At a resolution of 512x512, around 600MB in data was generated, consisting of labels and images with varying backgrounds, camera positions, lighting and weather conditions. This method frees up time for researches to focus on other tasks such as building the environments and sourcing realistic 3D models and textures. 
 
 \subsection{Vast Scope of Possible Scenarios}
 
@@ -84,44 +78,40 @@ Unreal Engine 5 allows for the creation of realistic environments in basically a
 
 \subsection{Introduction}
 
-The synthetic data generation system was built using Unreal Engine 5.4 and Python 3.11. The two systems do not run in unison and require running once each to generate the data, first the Unreal Engine simulation and then the Python script. The Unreal Engine simulation generates the images and the Python script generates the labels. While Unreal Engine sports a powerful blueprint system, C++ code was mainly used to develop the system such as event sequencing \ref{sec:handling_concurrent_actions}, camera positioning \ref{sec:positioning_the_camera} and screenshot capture .
+The synthetic data generation system was built using Unreal Engine 5.4 \cite{EpicGames2024} and Python 3.11 \cite{PythonSoftwareFoundation2022}. The two systems do not run in unison and require running once each to generate the data, first the Unreal Engine simulation and then the Python script. The Unreal Engine simulation generates the images and the Python script generates the labels. While Unreal Engine sports a powerful blueprint system, C++ code was mainly used to develop the system such as event sequencing \ref{sec:handling_concurrent_actions}, camera positioning \ref{sec:positioning_the_camera} and screenshot capture.
+
+This was developed and tested on a machine running Windows 11 with an RTX 3080 GPU, i7 8700k CPU and 32GB of RAM with the storage being a Samsung SSD 970 EVO Plus 2TB.
 
 \subsection{Achieving High Fidelity} \label {sec:achieving_high_fidelity}
 
 Aside from being an efficient method of generating synthetic data, the contents of the data can be completely controlled. Unlike content generated with some neural networks \cite{richter2021enhancingphotorealismenhancement}, there are no hallucinations to deal with and temporal consistency is maintained throughout the data.
 
-
-\section{The Environment}
-
-A benefit of using Unreal Engine 5 is the ability to create realistic and varied environments which can 
-
-
-\subsection{The Water} \label {sec:the_water}
-
-The water in the simulation is provided by Unreal Engine 5's Water plugin, more specifically the Water Body Ocean class. This water is simulated at interactive rates as a fluid, with the ability to simulate waves and the results of environment effects such as colour and lighting. With the fluid being simulated in real time, the water is able to be interacted with by actors in the scene, such as the buoys, as discussed in \ref{sec:the_buoys}.
-
-Wave simulation is achieved through the use of a trochoidal or Gerstner wave function \cite{constantin2017gerstner}.
-
-A terrain is required for fluid simulation.
-
 \subsection{The Terrain}
 
 Terrain, with the purpose of appearing in scenes (and not just as a requirement for fluid simulation as discussed in section \ref{sec:the_water}), was created using one of two methods.
 
-Two methods were experimented with for creating the terrain. The first was to make use of assets available on the Unreal Engine marketplace, most notably the Megascans library \cite{QuixelMegascans}. This methods has the benefit of allowing the developer to create a realistic environment which can be travelled. However, a major downside is that assets often cost money and it can take a long time to create a realistic environment.
+Two methods were experimented with for creating the terrain. The first was to make use of assets available on the Unreal Engine marketplace, most notably the Megascans library \cite{QuixelMegascans}. This method has the benefit of allowing the developer to create a realistic environment which can be travelled. However, a major downside is that assets often cost money and it can take hours, days, even weeks to create a realistic environment, depending on the type of environment needed.
+
+Talk about heightmaps
 
 The second method was to use high dynamic range images (HDRI) to create the illusion of terrain, which normally provided a realistic sky too as a bonus. This method allowed for near instant creation of a realistic environment, giving the illusion of entire lakes with mountains in the background. However, the downside is that as the image is projected in a dome around a central point, moving even small distances away from the central point can cause the illusion to be broken. For this task, HDRI-based environments were suitable as the camera was moving only short distances around a static point.
+
+\subsection{The Water} \label {sec:the_water}
+
+The water in the simulation is provided by Unreal Engine 5's Water plugin, more specifically the Water Body Ocean class. This water is simulated at interactive rates as a fluid, with the ability to simulate waves and the results of environment effects such as colour and lighting. With the fluid being simulated in real time, the water is able to be interacted with by entities (known as actors) in the scene, such as the buoys, as discussed in \ref{sec:the_buoys}. Although HDRI environments were used, this plugin requires some terrain to be present in the scene to work.
+
+Wave simulation is achieved through the use of a trochoidal or Gerstner wave function \cite{constantin2017gerstner}. Parameters such as wavelength,wavelength falloff, amplitude, steepness, speed and direction can be set to create a range of wave types. The water can also be set to be reflective, refractive and to have caustics, although it was noted that this had a negative impact on frame rate. 
 
 \subsection{The Sky}
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{images/ultra_dynamic_sky.png}
-    \caption{An example of the sky generated using the Ultra Dynamic Sky plugin in Unreal Engine 5.}
-    \label{fig:sky_example}
+    \includegraphics[width=\linewidth]{images/sky_comparison.png}
+    \caption{A real photo of a sky (left) and Ultra Dynamic Sky (right).}
+    \label{fig:sky_comparison}
 \end{figure}
 
-As with the terrain, two methods were experimented with for generating a realistic sky. The first was to use a plugin called Ultra Dynamic Sky \cite{UltraDynamicSky} which provided scene-wide realistic sky scapes and weather conditions. The second was to use a high dynamic range image (HDRI) to create the illusion of a sky. This method works well for static scenes in which minimal movement is required.
+As with the terrain, two methods were experimented with for generating a realistic sky. The first was to use a plugin called Ultra Dynamic Sky \cite{UltraDynamicSky} which provided scene-wide realistic sky scapes and weather conditions. The second was to use a high dynamic range image (HDRI) to create the illusion of a sky. This method works well for static scenes in which minimal movement is required. Figure \ref{fig:sky_comparison} shows a comparison between a real sky and the Ultra Dynamic Sky plugin. Images courtesy of stockcake.com \cite{StockCake2025} and the Ultra Dynamic Sky plugin respectively.
 
 \subsection{The Weather}
 
@@ -131,7 +121,7 @@ Weather conditions, such as rain, snow and fog were also generated with the Ultr
 
 \subsection{The Buoys} \label{sec:the_buoys}
 
-The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The 3d models were purchased and imported into the scene. A class of MarkerBuoyBase was created which was inherited by all buoys in the scene. This class contained the logic for the buoys' behaviour.
+The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The 3D models were purchased and imported into the scene. A class of MarkerBuoyBase was created which was inherited by all buoys in the scene. This class contained the logic for the buoys' behaviour.
 
 Each buoy was placed in the scene at the same location to allow for the HDRI background to be effective, with all buoys apart from the subject of the current visit being set to invisible.
 
@@ -142,12 +132,10 @@ Unreal Engine 5's water plugin allows for buoyancy simulation through the use of
 For each buoy, 4 pontoons were placed at relative co-ordinates of:
 
 \begin{itemize}
-
     \item X: 300, Y: 300, Z: 150
     \item X: 300, Y: -300, Z: 150
     \item X: -300, Y: -300, Z: 150
-    \item X: -300, Y: 300, Z: 150 
-
+    \item X: -300, Y: 300, Z: 150
 \end{itemize}
 
 \section{The Data Generation Pipeline}
@@ -169,7 +157,7 @@ cumulativeDelay = initialDelay + (markerBuoyNumber * numberOfVisits + visitNumbe
 
 \subsection{Positioning the Camera} \label {sec:positioning_the_camera}
 
-To replicate the position of a camera as if it were on some sort of vessel, randomisation of the camera's position was included.
+To replicate the position of a camera as if it were on some sort of vessel, randomisation of the camera's position was included. One limitation of this approach was that it was technically possible for all of the images to be taken from the same position, producing ineffective data for generalisation. However, this was not noticed in the data generated.
 
 \subsection{Determining the Position of the Buoy}
 
@@ -181,8 +169,8 @@ Bounding boxes were generated by detecting points on the screen, per frame, whic
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{images/buoy_with_bounding_box.png}
-    \caption{A buoy in the scene with a bounding box which is slightly too big.}
+    \includegraphics[width=\linewidth]{images/masked-buoy.png}
+    \caption{A buoy in a scene showing the stages of the mask generation.}
     \label{fig:buoy_with_bounding_box}
 \end{figure}
 
@@ -213,8 +201,8 @@ By making use of FTimerHandle, as mentioned in \ref{sec:handling_concurrent_acti
 
 \begin{figure}[t]
     \centering
-    \includegraphics[width=\linewidth]{images/buoy_without_mask.png}
-    \caption{A buoy in the scene without a mask.}
+    \includegraphics[width=\linewidth]{images/buoy-realism-comparison.jpg}
+    \caption{A real photo of a buoy (left) and a buoy generated in Unreal Engine 5 (right).}
     \label{fig:buoy_without_mask}
 \end{figure}
 
@@ -232,6 +220,8 @@ In conclusion, this method for generating data is efficient and allows for scena
 \section{Future Work}
 
 Some sort of fail safe to ensure that the generation can recover if some issues occur such as a power cut.
+
+Data augmentation
 
 {
     \small
