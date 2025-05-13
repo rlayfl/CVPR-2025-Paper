@@ -49,18 +49,16 @@ First line of institution2 address\\
 \maketitle
 
 \begin{abstract}
-    This paper presents a method for generating large-scale sets of synthetic data of ocean marker buoys using Unreal Engine 5. The method is discussed in detail, including development of the environment, buoys and data generation pipeline. The paper also discusses the benefits of synthetic data generation, particularly in the context of maritime navigation as this can often take place in inconvenient or dangerous conditions. This paper covers a two-stage pipeline using Unreal Engine 5.4's C++ classes for image generation and Python for labelling, capable of generating around 2000 pieces of labelled data (images and labels) per hour.
+    Training of deep learning algorithms requires large amounts of data for them to perform well. This paper presents a method for generating large-scale sets of synthetic data using Unreal Engine 5. The method is discussed in detail, including development of the environment, objects of interest and data generation pipeline. The paper discusses the benefits of synthetic data generation in the context of maritime navigation as collecting real world data can be inconvenient or dangerous. This paper covers a two-stage pipeline using Unreal Engine 5.4's C++ classes for image generation and Python for labelling. Once set up, this method has the capacity to generate around 2000 pieces of labelled data (images and labels) per hour and provides source code for development of datasets for other purposes.
     \end{abstract}
 
 \section{Introduction}
 
-Collecting real-world data for training object detection models, especially in the context of maritime navigation, can be a lengthy process and inconvenient process, potentially incurring risk to researchers in some settings, such as extreme weather. Synthetic data can supplement real-world datasets or, in some cases, entirely replace them in model training.
+Collecting real-world data for training object detection models can be a lengthy and inconvenient process, potentially incurring risk to researchers in some settings. Synthetic data can supplement real-world datasets or, in some cases, entirely replace them in model training.
 
-\section{Literature Review}
+The generation of synthetic data for machine learning tasks can save time, reduce risk and increase the scope of the data produced. One study identified a benefit in generating synthetic data of car crashes for predicting dangerous vehicles, reducing the missed detection rate by 18.5\% compared to real data only models. \cite{Kim_Lee_Hwang_Suh_2019} 
 
-The generation of synthetic data for machine learning tasks has taken place for many years. It takes place to save time, reduce risk and increase the scope of the data produced. One such study identified a benefit in generating synthetic data of car crashes for predicting dangerous vehicles, reducing the missed detection rate by 18.5\% compared to real data only models. \cite{Kim_Lee_Hwang_Suh_2019} 
-
-However, synthetic data generation can often lead to data which is too clean looking and missing the imperfections of the real world, such as natural variation, deformation and clutter. \cite{Feng_2024_CVPR}
+However, synthetic data generation can often lead to data which is too clean looking and missing the imperfections of the real world, such as natural variation, deformation and clutter \cite{Feng_2024_CVPR}. 
 
 \section{Benefits of Synthetic Data Generation of Marker Buoys}
 
