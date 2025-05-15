@@ -1,0 +1,57 @@
+\begin{thebibliography}{9}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Constantin and Monismith(2017)]{constantin2017gerstner}
+Adrian Constantin and Stephen~G Monismith.
+\newblock Gerstner waves in the presence of mean currents and rotation.
+\newblock \emph{Journal of Fluid Mechanics}, 820:\penalty0 511--528, 2017.
+
+\bibitem[{Everett Gunther}(2025)]{UltraDynamicSky}
+{Everett Gunther}.
+\newblock {Ultra Dynamic Sky}, 2025.
+\newblock Accessed: 07-Mar-2025.
+
+\bibitem[Feng et~al.(2024)Feng, Zhong, Jie, Xie, and Ma]{Feng_2024_CVPR}
+Chengjian Feng, Yujie Zhong, Zequn Jie, Weidi Xie, and Lin Ma.
+\newblock Instagen: Enhancing object detection by training on synthetic
+  dataset.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pages 14121--14130, 2024.
+
+\bibitem[Foundation(2022)]{PythonSoftwareFoundation2022}
+Python~Software Foundation.
+\newblock Python 3.11.0 release, 2022.
+\newblock Accessed: 2025-03-10.
+
+\bibitem[Games(2024)]{EpicGames2024}
+Epic Games.
+\newblock Unreal engine 5.4 is now available, 2024.
+\newblock Accessed: 2025-03-10.
+
+\bibitem[Kim et~al.(2019)Kim, Lee, Hwang, and Suh]{Kim_Lee_Hwang_Suh_2019}
+Hoon Kim, Kangwook Lee, Gyeongjo Hwang, and Changho Suh.
+\newblock Crash to not crash: Learn to identify dangerous vehicles using a
+  simulator.
+\newblock \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  33\penalty0 (01):\penalty0 978--985, 2019.
+
+\bibitem[{Quixel Megascans}(2025)]{QuixelMegascans}
+{Quixel Megascans}.
+\newblock {Quixel Megascans: Photorealistic 3D Asset Library}, 2025.
+\newblock Accessed: 07-Mar-2025.
+
+\bibitem[Richter et~al.(2021)Richter, AlHaija, and
+  Koltun]{richter2021enhancingphotorealismenhancement}
+Stephan~R. Richter, Hassan~Abu AlHaija, and Vladlen Koltun.
+\newblock Enhancing photorealism enhancement, 2021.
+
+\bibitem[StockCake(2025)]{StockCake2025}
+StockCake.
+\newblock Captivating free images for every occasion, 2025.
+\newblock Accessed: 2025-03-10.
+
+\end{thebibliography}

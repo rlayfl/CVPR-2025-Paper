@@ -60,15 +60,11 @@ The generation of synthetic data for machine learning tasks can save time, reduc
 
 However, synthetic data generation can often lead to data which is too clean looking and missing the imperfections of the real world, such as natural variation, deformation and clutter \cite{Feng_2024_CVPR}. 
 
-\section{Benefits of Synthetic Data Generation of Marker Buoys}
-
-\subsection{Efficiency}
+\section{Synthetic Data Generation with Unreal Engine 5}
 
 To test the efficiency of this data generation method, a total of 1000 images were generated. With an initial delay of 5 seconds to allow the simulation to properly load and with a time taken of 2 seconds per image, the total time taken to generate the images was 33 minutes and 25 seconds. This does not include the time taken to generate the environment or the buoys, which was carried out separately. Furthermore, running the python script to generate the labels takes only a few seconds. This is covered in more detail in section \ref{sec:mask_coordinates}.
 
 At a resolution of 512x512, around 600MB in data was generated, consisting of labels and images with varying backgrounds, camera positions, lighting and weather conditions. This method frees up time for researches to focus on other tasks such as building the environments and sourcing realistic 3D models and textures. 
-
-\subsection{Vast Scope of Possible Scenarios}
 
 Unreal Engine 5 allows for the creation of realistic environments in basically any setting, if one can source the correct assets. This allows for the generation of data which covers scenarios which might be difficult or impossible to capture in the real world. For example, it allows for the generation of data in dangerous conditions such as in a storm or natural disaster and inconvenient conditions such as specific times of day or year.
 
@@ -119,7 +115,7 @@ Weather conditions, such as rain, snow and fog were also generated with the Ultr
 
 \subsection{The Buoys} \label{sec:the_buoys}
 
-The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The 3D models were purchased and imported into the scene. A class of MarkerBuoyBase was created which was inherited by all buoys in the scene. This class contained the logic for the buoys' behaviour.
+The buoys are included in the scene as actors with static meshes, which play the part of digital twins of real marker buoys. The 3D models were purchased and imported into the scene. A class of MarkerBuoyBase was created which was inherited by all buoys in the scene. This class contained the logic for the buoys' interactive behaviour.
 
 Each buoy was placed in the scene at the same location to allow for the HDRI background to be effective, with all buoys apart from the subject of the current visit being set to invisible.
 
@@ -157,7 +153,7 @@ cumulativeDelay = initialDelay + (markerBuoyNumber * numberOfVisits + visitNumbe
 
 To replicate the position of a camera as if it were on some sort of vessel, randomisation of the camera's position was included. One limitation of this approach was that it was technically possible for all of the images to be taken from the same position, producing ineffective data for generalisation. However, this was not noticed in the data generated.
 
-\subsection{Determining the Position of the Buoy}
+\subsection{Semantic Labelling}
 
 Two methods for generating labels were tested. The first was to generate bounding boxes around the buoys in the scene using the inbuilt head's up display (HUD) feature. The second was to generate masks of the buoys in the scene. 
 
@@ -191,7 +187,7 @@ The R value of CustomStencil was also connected to a Subtract node's A input, wi
 
 A 3 Vector Constant node with its RGB values set to 1.0, 0.0, 0.0 was connected to the B input of the second Linear Interpolation node. The output of the first Linear Interpolation node was connected to the Alpha input of the second Linear Interpolation node. Finally, the output of the second Linear Interpolation node was connected to the Emissive Colour input of the material. This material should then be applied to every static mesh with a CustomDepth Stencil Value of 2.
 
-\subsection{Automating Screenshot Capture}
+\subsection{Scene Capture}
 
 By making use of FTimerHandle, as mentioned in \ref{sec:handling_concurrent_actions}, screenshots could be taken at set intervals. For each visit, two screenshots per buoy were taken, the first with the red semantic segmentation mask applied and the second without, with each being stored in separate directories. The position of the buoy was frozen for this so that the mask's coordinates perfectly matched that of the buoy in the unmasked image.
 
@@ -204,10 +200,11 @@ By making use of FTimerHandle, as mentioned in \ref{sec:handling_concurrent_acti
     \label{fig:buoy_without_mask}
 \end{figure}
 
-A Python script, dubbed Mask Pixel Joiner, was created. For each image inside the masked screenshot directory, the script would open the image and scan each row from left to right, until a red pixel was found. The script would then store the x and y coordinates of the red pixel. This would continue for every row of pixels. Once this was completed, the same process would be carried out but from bottom to top and right to left, determining the pixels which made up the edge of the buoy in an anti-clockwise direction. The coordinates were then stored in a .txt file.
+A Python script, (Mask Pixel Joiner), exports each image inside the masked screenshot directory, the script would open the image and scan each row from left to right, until a red pixel was found. The script would then store the x and y coordinates of the red pixel. This would continue for every row of pixels. Once this was completed, the same process would be carried out but from bottom to top and right to left, determining the pixels which made up the edge of the buoy in an anti-clockwise direction. The coordinates were then stored in a .txt file.
 
+\section{Discussion}
 
-\section{Applications}
+Applications Limitations Usecases
 
 The main application of this work is for generating data to train object detection models. 
 
